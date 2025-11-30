@@ -27,6 +27,5 @@ def get_total_follower_count():
         return word
     
 
-
 if __name__ == '__main__':
     app.run()
