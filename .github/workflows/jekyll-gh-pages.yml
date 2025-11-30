@@ -22,10 +22,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare static site folder
+      - name: Prepare public site
         run: |
           mkdir public
           cp scraper.py public/
+          # Build HTML page that shows scraper.py
+          echo "<!DOCTYPE html>
+          <html>
+          <head>
+            <title>scraper.py</title>
+            <meta charset='UTF-8'>
+            <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css'>
+            <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js'></script>
+            <script>hljs.highlightAll();</script>
+          </head>
+          <body style='padding: 20px; font-family: sans-serif;'>
+            <h1>scraper.py</h1>
+            <pre><code class='language-python'>" > public/index.html
+          
+          # Escape HTML for code embedding
+          sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' scraper.py >> public/index.html
+          
+          echo "</code></pre></body></html>" >> public/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
