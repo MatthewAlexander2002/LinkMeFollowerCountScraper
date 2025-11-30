@@ -1,9 +1,7 @@
-name: Publish scraper.py to GitHub Pages
+name: Run scraper and deploy to GitHub Pages
 
 on:
-  push:
-    branches: ["main"]
-  workflow_dispatch:
+  workflow_dispatch:  # You run it manually
 
 permissions:
   contents: read
@@ -19,31 +17,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Prepare public site
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run scraper and generate HTML
         run: |
+          python3 scraper.py > follower.txt
           mkdir public
-          cp scraper.py public/
-          # Build HTML page that shows scraper.py
-          echo "<!DOCTYPE html>
-          <html>
-          <head>
-            <title>scraper.py</title>
-            <meta charset='UTF-8'>
-            <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css'>
-            <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js'></script>
-            <script>hljs.highlightAll();</script>
-          </head>
-          <body style='padding: 20px; font-family: sans-serif;'>
-            <h1>scraper.py</h1>
-            <pre><code class='language-python'>" > public/index.html
-          
-          # Escape HTML for code embedding
-          sed 's/&/\&amp;/g; s/</\&lt;/g; s/>/\&gt;/g' scraper.py >> public/index.html
-          
-          echo "</code></pre></body></html>" >> public/index.html
+          COUNT=$(cat follower.txt)
+          echo "<!DOCTYPE html><html><head><meta charset='utf-8'></head><body><h1>${COUNT}</h1></body></html>" > public/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
@@ -54,8 +44,8 @@ jobs:
           path: public
 
   deploy:
-    runs-on: ubuntu-latest
     needs: build
+    runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
