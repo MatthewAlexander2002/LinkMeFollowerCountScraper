@@ -1,8 +1,8 @@
 name: Auto-scrape and deploy follower count to GitHub Pages
 
 on:
-  schedule:
-    - cron: "0 * * * *"   # every hour
+#  schedule:
+#    - cron: "0 * * * *"   # every hour
   workflow_dispatch:        # you can still run manually if you want
 
 permissions:
